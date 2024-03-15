@@ -1,0 +1,6 @@
+﻿{
+  "consumerOption": {
+    "connectionString": "amqp://guest:guest@localhost:5672",
+    "batchConsumeCount": 1
+  }
+}

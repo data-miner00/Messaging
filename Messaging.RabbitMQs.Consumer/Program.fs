@@ -4,14 +4,20 @@ open System.Text
 open System
 open System.Text.Json
 open Messaging.Core
+open Microsoft.Extensions.Configuration
+open Messaging.RabbitMQs.Consumer.Options
 
 do printfn "Messaging Receiver starting..."
 
-let connectionString = "amqp://guest:guest@localhost:5672"
+let builder = ConfigurationBuilder()
+let config = builder.AddJsonFile("settings.json").Build()
+
+let option = config.GetSection(nameof(ConsumerOption)).Get<ConsumerOption>();
+
 let appName = "Message Receiver"
 
 let factory = new ConnectionFactory()
-factory.Uri <- new Uri(connectionString)
+factory.Uri <- new Uri(option.ConnectionString)
 factory.ClientProvidedName <- appName
 
 let connection = factory.CreateConnection()
@@ -24,7 +30,7 @@ let queueName = "CustomerQueue"
 channel.ExchangeDeclare(exchangeName, ExchangeType.Direct)
 channel.QueueDeclare(queueName, false, false, false, null) |> ignore
 channel.QueueBind(queueName, exchangeName, routingKey, null)
-channel.BasicQos(0 |> uint32, 1 |> uint16, false)
+channel.BasicQos(0 |> uint32, option.BatchConsumeCount |> uint16, false)
 
 let listener (args: BasicDeliverEventArgs) =
     let body = args.Body.ToArray()
