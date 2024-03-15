@@ -1,0 +1,6 @@
+﻿{
+  "publisherOption": {
+    "connectionString": "amqp://guest:guest@localhost:5672",
+    "eventsToBePublished": 21
+  }
+}
